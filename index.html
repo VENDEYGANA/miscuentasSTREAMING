@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Datos de Cuenta y Tabla de Compras</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #ed7318;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .form-group button:hover {
+            background-color: #d96512;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .copy-button, .control-button, .response-button, .edit-button, .delete-button, .whatsapp-button {
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #ed7318;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .copy-button:hover, .control-button:hover, .response-button:hover, .edit-button:hover, .delete-button:hover, .whatsapp-button:hover {
+            background-color: #d96512;
+        }
+        .pending-response {
+            background-color: #ffcccc;
+        }
+        .has-response {
+            background-color: #ccffcc;
+        }
+        .header-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-group .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .message {
+            margin-top: 10px;
+            color: green;
+        }
+        .back-button {
+            padding: 10px 20px;
+            background-color: #ed7318;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #d96512;
+        }
+        @media (max-width: 600px) {
+            .form-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container header-group">
+        <div class="form-group">
+            <label for="accountData">Datos de la Cuenta:</label>
+            <input type="text" id="accountData" placeholder="Datos de cuenta">
+        </div>
+        <div class="form-group">
+            <label for="clientName">Nombre del Cliente:</label>
+            <input type="text" id="clientName" placeholder="Nombre del Cliente">
+        </div>
+        <div class="form-group">
+            <label for="clientPhone">Teléfono del Cliente:</label>
+            <input type="text" id="clientPhone" placeholder="Teléfono del Cliente">
+        </div>
+        <div class="form-group">
+            <button onclick="saveData()">Guardar</button>
+        </div>
+        <div class="form-group">
+            <button onclick="clearFields()">Limpiar</button>
+        </div>
+        <div class="message" id="message"></div>
+    </div>
+
+    <div class="container">
+        <h2>Tabla de Compras</h2>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Dato de la Cuenta</th>
+                    <th>Nombre del Cliente</th>
+                    <th>Teléfono del Cliente</th>
+                    <th>Fecha de Compra</th>
+                    <th>Fecha de Corte</th>
+                    <th>Proveedor</th>
+                    <th>Control de Fallas</th>
+                    <th>Respuesta de Falla</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se agregarán las filas de datos guardados -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón de regreso -->
+    <button class="back-button" onclick="window.location.href='https://www.vendeygana.net/user/'">Regresar a MI CUENTA VENDE Y GANA</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            welcomeMessage();
+            loadSavedData();
+        });
+
+        function welcomeMessage() {
+            alert("BIENVENIDO A TU SISTEMA DE CONTROL DE CUENTA VENDE Y GANA, porque si tu CRECES, CRECEMOS CONTIGO! Aquí agregas tus cuentas el NOMBRE DE TUS CLIENTES SU TELEFONO Y PUEDES DARLE COPIAR Y ENVIAR POR WHATSAPP LA INFORMACION puedes tener el control de la fallas y respuestas");
+        }
+
+        function validateAccountData(accountData) {
+            return accountData.includes('@');
+        }
+
+        function validateClientPhone(clientPhone) {
+            const phoneRegex = /^[\d\+]+$/;
+            return phoneRegex.test(clientPhone);
+        }
+
+        function saveData() {
+            const accountData = document.getElementById('accountData').value;
+            const clientName = document.getElementById('clientName').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+            const provider = "VENDE Y GANA";
+
+            if (!validateAccountData(accountData)) {
+                alert('El campo "Datos de la Cuenta" debe contener un "@"');
+                return;
+            }
+
+            if (!validateClientPhone(clientPhone)) {
+                alert('El campo "Teléfono del Cliente" solo puede contener números y el signo "+"');
+                return;
+            }
+
+            if (accountData && clientName && clientPhone) {
+                const currentDateTime = new Date();
+                const purchaseDate = currentDateTime.toLocaleString();
+                const cutOffDate = new Date(currentDateTime);
+                cutOffDate.setDate(currentDateTime.getDate() + 30);
+
+                const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                const newRow = tableBody.insertRow();
+                const accountCell = newRow.insertCell(0);
+                const nameCell = newRow.insertCell(1);
+                const phoneCell = newRow.insertCell(2);
+                const purchaseDateCell = newRow.insertCell(3);
+                const cutOffDateCell = newRow.insertCell(4);
+                const providerCell = newRow.insertCell(5);
+                const controlCell = newRow.insertCell(6);
+                const responseCell = newRow.insertCell(7);
+                const actionsCell = newRow.insertCell(8);
+
+                accountCell.textContent = accountData;
+                nameCell.textContent = clientName;
+                phoneCell.textContent = clientPhone;
+                purchaseDateCell.textContent = purchaseDate;
+                cutOffDateCell.textContent = cutOffDate.toLocaleString();
+                providerCell.innerHTML = provider + '<br><button class="copy-button" onclick="copyData(this)">Copiar Datos de la Cuenta</button>';
+                controlCell.innerHTML = '<button class="control-button" onclick="controlIssue(this)">Control de Fallas</button>';
+                responseCell.innerHTML = '<button class="response-button" onclick="responseIssue(this)">Respuesta de Falla</button>';
+                actionsCell.innerHTML = '<button class="edit-button" onclick="editRow(this)">Editar</button>' +
+                                        ' <button class="delete-button" onclick="deleteRow(this)">Eliminar</button>' +
+                                        ' <button class="whatsapp-button" onclick="sendWhatsApp(this)">Enviar por WhatsApp</button>';
+
+                newRow.classList.add('pending-response');
+
+                // Guardar los datos en localStorage
+                const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+                savedData.push({
+                    data: accountData,
+                    name: clientName,
+                    phone: clientPhone,
+                    purchaseDate: purchaseDate,
+                    cutOffDate: cutOffDate.toLocaleString(),
+                    provider: provider,
+                    control: '',
+                    controlDate: '',
+                    response: ''
+                });
+                localStorage.setItem('accountData', JSON.stringify(savedData));
+
+                document.getElementById('message').innerText = 'Datos guardados correctamente.';
+
+                // Limpiar los campos de entrada
+                clearFields();
+            } else {
+                document.getElementById('message').innerText = 'Por favor, complete todos los campos.';
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('accountData').value = '';
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientPhone').value = '';
+        }
+
+        function loadSavedData() {
+            const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+            const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+
+            savedData.forEach(item => {
+                const newRow = tableBody.insertRow();
+                const accountCell = newRow.insertCell(0);
+                const nameCell = newRow.insertCell(1);
+                const phoneCell = newRow.insertCell(2);
+                const purchaseDateCell = newRow.insertCell(3);
+                const cutOffDateCell = newRow.insertCell(4);
+                const providerCell = newRow.insertCell(5);
+                const controlCell = newRow.insertCell(6);
+                const responseCell = newRow.insertCell(7);
+                const actionsCell = newRow.insertCell(8);
+
+                accountCell.textContent = item.data;
+                nameCell.textContent = item.name;
+                phoneCell.textContent = item.phone;
+                purchaseDateCell.textContent = item.purchaseDate;
+                cutOffDateCell.textContent = item.cutOffDate;
+                providerCell.innerHTML = item.provider + '<br><button class="copy-button" onclick="copyData(this)">Copiar Datos de la Cuenta</button>';
+                controlCell.innerHTML = item.control ? item.control + ' (' + item.controlDate + ')' + '<br><button class="control-button" onclick="controlIssue(this)">Control de Fallas</button>' : '<button class="control-button" onclick="controlIssue(this)">Control de Fallas</button>';
+                responseCell.innerHTML = item.response ? item.response + '<br><button class="response-button" onclick="responseIssue(this)">Respuesta de Falla</button>' : '<button class="response-button" onclick="responseIssue(this)">Respuesta de Falla</button>';
+                actionsCell.innerHTML = '<button class="edit-button" onclick="editRow(this)">Editar</button>' +
+                                        ' <button class="delete-button" onclick="deleteRow(this)">Eliminar</button>' +
+                                        ' <button class="whatsapp-button" onclick="sendWhatsApp(this)">Enviar por WhatsApp</button>';
+
+                if (item.response) {
+                    newRow.classList.add('has-response');
+                } else {
+                    newRow.classList.add('pending-response');
+                }
+            });
+        }
+
+        function copyData(button) {
+            // Obtener la fila donde está el botón
+            const row = button.parentElement.parentElement;
+            const accountData = row.cells[0].textContent;
+            const purchaseDate = row.cells[3].textContent;
+            const cutOffDate = row.cells[4].textContent;
+
+            const textToCopy = `Cuenta: ${accountData}\nFecha de Compra: ${purchaseDate}\nFecha de Corte: ${cutOffDate}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Datos copiados al portapapeles');
+            }).catch(err => {
+                console.error('Error al copiar datos: ', err);
+            });
+        }
+
+        function controlIssue(button) {
+            alert('Este control es interno del cliente, no está relacionado DIRECTAMENTE CON VENDE Y GANA. Debe reportar la falla en el sistema de VENDE Y GANA para recibir asistencia. Este botón es solo para su control interno.');
+            const control = prompt('Ingrese el control de fallas:');
+            if (control) {
+                const row = button.parentElement.parentElement;
+                const currentDateTime = new Date().toLocaleString();
+                row.cells[6].innerHTML = control + ' (' + currentDateTime + ')' + '<br><button class="control-button" onclick="controlIssue(this)">Control de Fallas</button>';
+
+                // Guardar el control en localStorage
+                const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+                const rowIndex = row.rowIndex - 1;
+                savedData[rowIndex].control = control;
+                savedData[rowIndex].controlDate = currentDateTime;
+                localStorage.setItem('accountData', JSON.stringify(savedData));
+            }
+        }
+
+        function responseIssue(button) {
+            const response = prompt('Ingrese la respuesta de la falla:');
+            if (response) {
+                const row = button.parentElement.parentElement;
+                row.cells[7].innerHTML = response + '<br><button class="response-button" onclick="responseIssue(this)">Respuesta de Falla</button>';
+                row.classList.remove('pending-response');
+                row.classList.add('has-response');
+
+                // Guardar la respuesta en localStorage
+                const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+                const rowIndex = row.rowIndex - 1;
+                savedData[rowIndex].response = response;
+                localStorage.setItem('accountData', JSON.stringify(savedData));
+            }
+        }
+
+        function editRow(button) {
+            const row = button.parentElement.parentElement;
+            const editOption = prompt('¿Qué desea hacer? \n1. Editar Datos de la Cuenta \n2. Agregar comentario a Control de Fallas \n3. Agregar comentario a Respuesta de Falla');
+
+            if (editOption === '1') {
+                const accountData = prompt('Editar datos de la cuenta:', row.cells[0].textContent);
+                if (accountData) {
+                    row.cells[0].textContent = accountData;
+
+                    // Guardar los cambios en localStorage
+                    const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+                    const rowIndex = row.rowIndex - 1;
+                    savedData[rowIndex].data = accountData;
+                    localStorage.setItem('accountData', JSON.stringify(savedData));
+                }
+            } else if (editOption === '2') {
+                const currentControl = row.cells[6].textContent.split(' (')[0];
+                const newComment = prompt('Agregar comentario a Control de Fallas:', '');
+                if (newComment) {
+                    const updatedControl = currentControl + '. ' + newComment;
+                    const currentDateTime = new Date().toLocaleString();
+                    row.cells[6].innerHTML = updatedControl + ' (' + currentDateTime + ')' + '<br><button class="control-button" onclick="controlIssue(this)">Control de Fallas</button>';
+
+                    // Guardar los cambios en localStorage
+                    const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+                    const rowIndex = row.rowIndex - 1;
+                    savedData[rowIndex].control = updatedControl;
+                    savedData[rowIndex].controlDate = currentDateTime;
+                    localStorage.setItem('accountData', JSON.stringify(savedData));
+                }
+            } else if (editOption === '3') {
+                const currentResponse = row.cells[7].textContent.split(' (')[0];
+                const newComment = prompt('Agregar comentario a Respuesta de Falla:', '');
+                if (newComment) {
+                    const updatedResponse = currentResponse + '. ' + newComment;
+                    row.cells[7].innerHTML = updatedResponse + '<br><button class="response-button" onclick="responseIssue(this)">Respuesta de Falla</button>';
+                    row.classList.remove('pending-response');
+                    row.classList.add('has-response');
+
+                    // Guardar los cambios en localStorage
+                    const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+                    const rowIndex = row.rowIndex - 1;
+                    savedData[rowIndex].response = updatedResponse;
+                    localStorage.setItem('accountData', JSON.stringify(savedData));
+                }
+            }
+        }
+
+        function deleteRow(button) {
+            const row = button.parentElement.parentElement;
+
+            // Eliminar los datos de localStorage
+            const savedData = JSON.parse(localStorage.getItem('accountData')) || [];
+            const rowIndex = row.rowIndex - 1;
+            savedData.splice(rowIndex, 1);
+            localStorage.setItem('accountData', JSON.stringify(savedData));
+
+            // Eliminar la fila de la tabla
+            row.remove();
+        }
+
+        function sendWhatsApp(button) {
+            const row = button.parentElement.parentElement;
+            const accountData = row.cells[0].textContent;
+            const clientName = row.cells[1].textContent;
+            const clientPhone = row.cells[2].textContent;
+            const purchaseDate = row.cells[3].textContent;
+            const cutOffDate = row.cells[4].textContent;
+
+            const message = `Hola ${clientName},\n\nAquí están los detalles de tu cuenta:\n\nCuenta: ${accountData}\nTeléfono: ${clientPhone}\nFecha de Compra: ${purchaseDate}\nFecha de Corte: ${cutOffDate}`;
+
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
